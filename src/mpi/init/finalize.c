@@ -195,6 +195,40 @@ int MPI_Finalize( void )
     rank = MPIR_Process.comm_world->rank;
 #endif    
 
+    int comm_size, rank,i;
+    long mean_Ttotal=0, mean_Ttotal_posted=0;
+    MPI_Comm_size(MPI_COMM_WORLD, &comm_size);
+    MPI_Comm_rank(MPI_COMM_WORLD, &rank);
+
+    long all_unexpected_search_time_total, all_posted_search_time_total;
+
+    if(Tcount!=0) {
+        mean_Ttotal=(long) Ttotal/ (long) Tcount;
+    }
+
+    MPI_Reduce(&mean_Ttotal, &all_unexpected_search_time_total, 1,MPI_LONG, MPI_SUM,0, MPI_COMM_WORLD);
+
+    if(Tcount_posted!=0) mean_Ttotal_posted= (long) Ttotal_posted/ (long) Tcount_posted;
+
+    MPI_Reduce(&mean_Ttotal_posted, &all_posted_search_time_total, 1,MPI_LONG, MPI_SUM,0, MPI_COMM_WORLD);
+
+    if(rank==0) {
+        long mean_searchtime=(all_unexpected_search_time_total)/ comm_size;
+        printf("mean_searchtime UMQ= %ld\n", mean_searchtime);
+
+        long mean_searchtime_posted=all_posted_search_time_total/ comm_size;
+        printf("mean_searchtime PRQ= %ld\n", mean_searchtime_posted);
+
+        printf("mean UMQ searchtime for rank0: %ld\n", mean_Ttotal);
+        printf("mean PRQ searchtime for rank0: %ld\n", mean_Ttotal_posted);
+     }
+
+     long all_Toverhead_PRQ, all_Toverhead_UMQ;
+
+     MPI_Reduce(&Toverhead_UMQ, &all_Toverhead_UMQ, 1,MPI_LONG, MPI_SUM,0, MPI_COMM_WORLD);
+     MPI_Reduce(&Toverhead_PRQ, &all_Toverhead_PRQ, 1,MPI_LONG, MPI_SUM,0, MPI_COMM_WORLD);
+
+
     /* Remove the attributes, executing the attribute delete routine.
        Do this only if the attribute functions are defined. */ 
     /* The standard (MPI-2, section 4.8) says that the attributes on 

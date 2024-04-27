@@ -46,6 +46,21 @@
    do not want mpi.h to depend on any other files or configure flags */
 #include "mpichconf.h"
 
+//SMGM added
+#define NUMQ 100000
+#define NUMR 2048
+#ifdef DEFINE_GLOBALS
+#define EXTERN
+#else
+#define EXTERN extern
+#endif
+EXTERN int UMQ_length[NUMQ], PRQ_length[NUMQ];
+EXTERN int Ttotal, Ttotal_posted;
+EXTERN int Tcount, Tcount_posted;
+EXTERN int Toverhead_PRQ, Toverhead_UMQ;
+EXTERN int QUEUE_THRESHOLD_PRQ, QUEUE_THRESHOLD_UMQ;
+//end SMGM
+
 #include "opa_primitives.h"
 
 /* if we are defining this, we must define it before including mpl.h */
@@ -1554,6 +1569,8 @@ typedef struct MPID_Request {
     /* Persistent requests have their own "real" requests.  Receive requests
        have partnering send requests when src=dest. etc. */
     struct MPID_Request *partner_request;
+
+    int sequence_num;
 
     /* User-defined request support via a "vtable".  Saves space in the already
      * bloated request for regular pt2pt and NBC requests. */
@@ -4696,6 +4713,33 @@ static inline int MPIR_Request_complete_fastpath(MPI_Request *request, MPID_Requ
     /* avoid normal fn_exit/fn_fail jump pattern to reduce jumps and compiler confusion */
     return mpi_errno;
 }
+
+//SMGM added
+typedef struct rank_info {
+int num_PRQ;
+int num_UMQ;
+int parent_PRQ[NUMQ];
+int parent_UMQ[NUMQ];
+int num_queue_elements;
+int rank_num;
+int cntx_id;
+} rank_info;
+
+EXTERN ANY_SOURCE_EXIST;
+EXTERN rank_info *all_rank_info;
+
+
+EXTERN MPID_Request  *recvq_unexpected_head[NUMQ];
+EXTERN MPID_Request  *recvq_unexpected_tail[NUMQ];
+
+EXTERN MPID_Request  *recvq_posted_head[NUMQ];
+EXTERN MPID_Request  *recvq_posted_tail[NUMQ];
+
+EXTERN MPID_Request  *recvq_wildposted_head;
+EXTERN MPID_Request  *recvq_wildposted_tail;
+EXTERN int seq_num;
+EXTERN int total_num_info;
+//end SMGM
 
 extern const char MPIR_Version_string[];
 extern const char MPIR_Version_date[];
