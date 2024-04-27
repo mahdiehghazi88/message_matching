@@ -1,0 +1,9 @@
+<dir>
+<file name="hwloc_bind.c" info="1473273118"/>
+</dir>
+<data>
+<fileinfo name="hwloc_bind.c">
+MPID_STATE_SMPI_SETAFFINITY smpi_setaffinity
+MPID_STATE_MPIDI_CH3I_SET_AFFINITY MPIDI_CH3I_set_affinity
+</fileinfo>
+</data>
