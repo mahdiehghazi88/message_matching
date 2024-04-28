@@ -1,5 +1,3 @@
-#Partner/non-partner Message Queue Design
-
 This repo implements partner/non-partner message queue design in MVAPICH2. The details of the design is available at https://www.queensu.ca/academia/afsahi/pprl/papers/CCPE-2018-2.pdf
 
 The design is mostly imlemented at src/mpid/ch3/src/ch3u_recvq.c
